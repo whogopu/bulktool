@@ -14,10 +14,10 @@ Script to extract Google PageSpeed API Data from multiple URLs. The script allow
 
    ```bash
    # Git
-   git clone https://github.com/jlhernando/google-pagespeed-bulk.git
+   git clone https://github.com/whogopu/google-pagespeed-bulk.git
 
    # OR Github's CLI
-   gh repo clone https://github.com/jlhernando/google-pagespeed-bulk
+   gh repo clone https://github.com/whogopu/google-pagespeed-bulk
    ```
 
 3. Install the modules from the script. Type in your terminal:
@@ -28,7 +28,7 @@ Script to extract Google PageSpeed API Data from multiple URLs. The script allow
 
 4. Get a Google API Key. You can do it from your [GCP console](https://console.cloud.google.com/apis/credentials) or from [from Google's documentation](https://developers.google.com/speed/docs/insights/v5/get-started)
 5. Add your key to “api-request.js” file.
-6. Add URLs into the 'urls.csv' file but keep the "url" header.
+6. Add URLs into the 'urls.csv' file but keep the "url" header. Enclose the url in double quotes if they have more than 1 query parameter or if any parameter has multiple comma separated values.
 7. You can change the number of tests per URL you'd like to perform. Change the variable `numTest` in Line 16 to your desired number of tests. Maximum recommended 5.
    ```javascript
    // Example tu run 3 lab tests
@@ -47,8 +47,13 @@ Once the script has finished, you will find the output under the "results" folde
 - results-test.csv
 - results-test.json
 
+If keepOldFiles = true, it will create the files in 
+
+results-test-[device]-[YYYY-MM-DD--HH-mm].csv format. Eg "results-test-mobile-2021-12-28--18-51.csv".
+
 These files will contain the lab metrics for each succesful test result from the URLs in your 'urls.csv' file. The metrics extarcted are:
 
+- Performance Score
 - Time To First Byte in milisenconds (TTFB)
 - First Contentful Paint in miliseconds (labFCP)
 - Largest Contentful Paint in miliseconds (labLCP)

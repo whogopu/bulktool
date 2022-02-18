@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="description" content="Page score graph" />
+		<meta name="author" content="Gopal" />
+		<meta name="viewport" content="user-scalable=no, initial-scale=1.0,
+			maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+		<title></title>
+		<!-- <link href="css/style.css" rel="stylesheet" /> -->
+	</head>
+	<body>
+
+		<p>hello</p>
+		<h2>
+			EVENTS:
+		</h2>
+		<div id='text'>
+		</div>
+		<!-- Create a div where the graph will take place -->
+		<div id="my_dataviz"></div>
+		<!-- <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script> -->
+		<!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
+		<!-- <script src="https://d3js.org/d3.v4.js"></script> -->
+		<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+		<script src="https://code.highcharts.com/highcharts.js"></script>
+		<script src="https://code.highcharts.com/modules/series-label.js"></script>
+		<script src="https://code.highcharts.com/modules/exporting.js"></script>
+		<script src="https://code.highcharts.com/modules/export-data.js"></script>
+		<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+		<!-- <script
+			src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/6.1.2/highcharts.js"
+			integrity="sha512-XyETUq4HNmZ4h3FSyhDC1oaPFYBfQPNcsHtD1nR/oKeNyfSqQkTCRILmWL59uHL5o1FYccpqoOO3b49J4Gx7GA=="crossorigin="anonymous"
+			referrerpolicy="no-referrer"></script> -->
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+			integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="crossorigin="anonymous"
+			referrerpolicy="no-referrer"></script>
+		<script
+			src="https://raw.githubusercontent.com/blacklabel/custom_events/master/js/customEvents.min.js"></script>
+		<link href="main.css" as="stylesheet" />
+
+		<figure class="highcharts-figure">
+			<div id="container"></div>
+			<p class="highcharts-description">
+				This demo visualizes a data set with irregular time intervals.
+				Highcharts comes with sophisticated functionality for dealing
+				with time data, including support for different time zones and
+				irregular intervals.
+			</p>
+		</figure>
+		<script src="main.js"></script>
+
+	</body>
+</html>

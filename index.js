@@ -10,18 +10,29 @@ import { median } from './median-math.js';
 
 /* Variables */
 const file = 'urls.csv'; // File name for list of URLs to check
-const folder = 'results'; // Name of folder for output
+const baseFolder = 'results'; // Name of base folder for output
 const fullJson = true; // Variable for testing purposes. Extracts full API response into JSON File
-const chunkNum = 10; // Number or URLs per batch
-const numTest = 1; // Number of Lab test to run (Lighthouse)
-const device = 'mobile'; // Test viewport. 'desktop' also available
+const chunkNum = process.env.CHUNK || 25; // Number or URLs per batch
+const numTest = process.env.TEST || 20; // Number of Lab test to run (Lighthouse)
+const device = process.env.DEVICE || 'desktop'; // Test viewport. 'desktop' also available
+const createSeparateFolders = true; // create separate folder for each [device]-[YYYY-MM-DD--HH-mm] combination
+const folder = createSeparateFolders ? `${baseFolder}/${device}-${moment().format('YYYY-MM-DD--HH-mm')}` : baseFolder; // Name of folder for output
+const keepOldFiles = true; // To keep result files separate based on [device] and [date]
+const deviceDateTimeStr = keepOldFiles ? `-${device}-${moment().format('YYYY-MM-DD--HH-mm')}` : ''; // File name suffix
 
 ////* Start of script *////
 console.time();
-// Create results folder
-existsSync(`./${folder}/`)
+// Create base results folder
+existsSync(`./${baseFolder}/`)
+  ? console.log(`${baseFolder} folder exists`)
+  : mkdir(`${baseFolder}`);
+
+// create the [device]-[YYYY-MM-DD--HH-mm] folder
+if (createSeparateFolders) {
+  existsSync(`./${folder}/`)
   ? console.log(`${folder} folder exists`)
-  : mkdir(`${folder}`);
+  : console.log('creating ', folder); mkdir(`${folder}`);
+}
 
 const getUrls = async () => {
   const list = await csv().fromFile(file);
@@ -56,7 +67,7 @@ const getSpeedData = async (testNum = 1) => {
       console.log(`Testing round #${round + 1} of chunk #${i + 1}`);
 
       // Loop trough array to create batch of promises (array)
-      const promises = chunk.map((testUrl) => apiRequest(testUrl, device));
+      const promises = chunk.map((testUrl,chunkItemIndex) => apiRequest(testUrl, device, i+1, chunkItemIndex+1, round+1, chunks.length, chunk.length, testNum ));
 
       // Send all requests in parallel
       const rawBatchResults = await Promise.allSettled(promises);
@@ -67,7 +78,7 @@ const getSpeedData = async (testNum = 1) => {
           if (fullJson === true) {
             !existsSync(`./${folder}/json/`) ? mkdir(`${folder}/json`) : null;
             writeFile(
-              `${folder}/json/resp-${round + index}.json`,
+              `${folder}/json/resp-${round + index}${deviceDateTimeStr}.json`,
               JSON.stringify(res, null, 2)
             );
           }
@@ -98,7 +109,8 @@ const getSpeedData = async (testNum = 1) => {
                 fid: fieldFID,
                 lcp: fieldLCP,
                 cls: fieldCLS / 100,
-                date: moment().format('YYYY-MM-DD'),
+                date: moment().format('YYYY-MM-DD HH:mm'),
+                device,
               };
               // Push to fieldRes array
               fieldDataRes.push(fieldResObj);
@@ -124,7 +136,8 @@ const getSpeedData = async (testNum = 1) => {
                   fid: fieldFID,
                   lcp: fieldLCP,
                   cls: fieldCLS / 100,
-                  date: moment().format('YYYY-MM-DD'),
+                  date: moment().format('YYYY-MM-DD HH:mm'),
+                  device,
                 };
                 // Push object to fieldOrigin array
                 fieldOriginRes.push(fieldResObj);
@@ -135,6 +148,7 @@ const getSpeedData = async (testNum = 1) => {
 
           // Extract Lab metrics
           const testUrl = res.value.lighthouseResult.finalUrl;
+          const PerformanceScore = res.value.lighthouseResult.categories.performance.score || 'no data';
           const TTFB = labAudit['server-response-time'].numericValue;
           const TTI =
             labAudit.metrics.details?.items[0].interactive ?? 'no data';
@@ -156,11 +170,12 @@ const getSpeedData = async (testNum = 1) => {
           const pageSize = parseFloat(
             (labAudit['total-byte-weight'].numericValue / 1000000).toFixed(3)
           );
-          const date = moment().format('YYYY-MM-DD');
+          const date = moment().format('YYYY-MM-DD HH:mm');
 
           // Construct object
           const finalObj = {
             testUrl,
+            PerformanceScore,
             TTFB,
             labFCP,
             labLCP,
@@ -171,6 +186,7 @@ const getSpeedData = async (testNum = 1) => {
             labMaxFID,
             pageSize,
             date,
+            device,
           };
           return finalObj;
         } else {
@@ -196,7 +212,7 @@ const getSpeedData = async (testNum = 1) => {
   if (fieldDataRes.length > 0) {
     // Write field data results into CSV
     console.log('Writing field data...');
-    writeFile(`./${folder}/results-field.csv`, parse(fieldDataRes)).catch(
+    writeFile(`./${folder}/results-field${deviceDateTimeStr}.csv`, parse(fieldDataRes)).catch(
       (err) => console.log(`Error writing field JSONfile: ${err}`)
     );
   }
@@ -205,7 +221,7 @@ const getSpeedData = async (testNum = 1) => {
     // Write field data results into CSV
     console.log('Writing origin field data...');
     writeFile(
-      `./${folder}/results-origin-field.csv`,
+      `./${folder}/results-origin-field${deviceDateTimeStr}.csv`,
       parse(fieldOriginRes)
     ).catch((err) => console.log(`Error writing Origin JSON file: ${err}`));
   }
@@ -214,7 +230,7 @@ const getSpeedData = async (testNum = 1) => {
   const labDataResFilter = labDataRes.filter((obj) => obj !== undefined);
   // Write lab data results into CSV
   console.log('Writing lab data...');
-  writeFile(`./${folder}/results-test.csv`, parse(labDataResFilter)).catch(
+  writeFile(`./${folder}/results-test${deviceDateTimeStr}.csv`, parse(labDataResFilter)).catch(
     (err) => console.log(`Error writing Lab JSON file:${err}`)
   );
 
@@ -222,7 +238,7 @@ const getSpeedData = async (testNum = 1) => {
   if (labResErrors.length > 0) {
     // Write field data results into CSV
     console.log('Writing error data...');
-    writeFile(`./${folder}/errors.csv`, parse(labResErrors)).catch((err) =>
+    writeFile(`./${folder}/errors${deviceDateTimeStr}.csv`, parse(labResErrors)).catch((err) =>
       console.log(`Error writing Origin JSON file: ${err}`)
     );
   }
@@ -246,6 +262,7 @@ const getSpeedData = async (testNum = 1) => {
         // Create object witht the same properties but calculating the median value per url
         const objMedian = {
           testUrl: cur.testUrl,
+          PerformanceScore: median(sameUrl.map(({ PerformanceScore }) => PerformanceScore)),
           TTFB: median(sameUrl.map(({ TTFB }) => TTFB)),
           labFCP: median(sameUrl.map(({ labFCP }) => labFCP)),
           labLCP: median(sameUrl.map(({ labLCP }) => labLCP)),
@@ -255,7 +272,8 @@ const getSpeedData = async (testNum = 1) => {
           TBT: median(sameUrl.map(({ TBT }) => TBT)),
           labMaxFID: median(sameUrl.map(({ labMaxFID }) => labMaxFID)),
           pageSize: median(sameUrl.map(({ pageSize }) => pageSize)),
-          date: moment().format('YYYY-MM-DD'),
+          date: moment().format('YYYY-MM-DD HH:mm'),
+          device,
         };
 
         // Push to accumulator
@@ -267,7 +285,7 @@ const getSpeedData = async (testNum = 1) => {
     }, []);
 
     // Write medians to CSV file
-    writeFile(`./${folder}/results-median.csv`, parse(labMedian)).catch((err) =>
+    writeFile(`./${folder}/results-median${deviceDateTimeStr}.csv`, parse(labMedian)).catch((err) =>
       console.log(`Error writing file:${err}`)
     );
   }
