@@ -17,7 +17,7 @@
     "crux",
     "chrome user experience report"
   ],
-  "author": "Jose Luis Hernando",
+  "author": "Gopal",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.21.1",
