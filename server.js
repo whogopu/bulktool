@@ -37,53 +37,30 @@ app.get('/', (req, res) => {
 })
 
 const mergeFiles = async (cb) => {
-  // const file1 = 'graph/desktop-2022-02-02--23-32/results-median-desktop-2022-02-02--23-32.csv';
-  // const file2 = 'graph/desktop-2022-02-03--21-52/results-median-desktop-2022-02-03--21-52.csv';
-  // const file3 = 'graph/desktop-2022-02-10--11-14/results-median-desktop-2022-02-10--11-14.csv';
-
-  // const list1 = await csv().fromFile(file1);
-  // const list2 = await csv().fromFile(file2);
-  // const list3 = await csv().fromFile(file3);
-
-  // const desktopList = list1.concat(list2).concat(list3)
-
   let desktopList = []
 
   let allFiles = fs.readdirSync(resultsFolder);
   let allFilesPromise = allFiles.map(async file => {
     if (file.includes('desktop')) {
-      // console.log('file', file)
       let desktopFiles = fs.readdirSync(`${resultsFolder}/${file}`)
-      // console.log(desktopFiles)
 
       let dfiles = desktopFiles.map(async function (file2) {
 
         if (file2.includes('-median-', `${resultsFolder}/${file}/${file2}`)) {
           console.log('accessing file: ', `${resultsFolder}/${file}/${file2}`)
           let file2List = await csv().fromFile(`${resultsFolder}/${file}/${file2}`)
-          // console.log('file2list', file2List)
           desktopList = desktopList.concat(file2List)
-          return 
-          // console.log('desktoplist2', desktopList.length)
-          // return
+          return
         }
       })
 
       await Promise.all(dfiles);
-
-
-      console.log('done desktop', dfiles.length)
     }
   })
 
   await Promise.all(allFilesPromise)
-
-
-
-
   console.log('desktop', desktopList.length)
 
-  //
   const desktopUrlMaps = {}
 
   desktopList.forEach(item => {
@@ -93,27 +70,35 @@ const mergeFiles = async (cb) => {
     let timestamp = moment(item.date, "YYYY-MM-DD hh:mm:ss").format("x")
     desktopUrlMaps[item.testUrl].push([parseInt(timestamp), 100 * Math.round(item.PerformanceScore * 100) / 100])
   })
-  // console.log('final', JSON.stringify(desktopUrlMaps))
-
-  // 
 
   writeFile(`./${desktopMergedFolder}/desktop.csv`, parse(desktopList)).catch((err) =>
     console.log(`Error writing desktop file:${err}`)
   );
 
-  const file4 = 'graph/mobile-2022-02-02--23-24/results-median-mobile-2022-02-02--23-24.csv';
-  const file5 = 'graph/mobile-2022-02-03--21-44/results-median-mobile-2022-02-03--21-44.csv';
-  const file6 = 'graph/mobile-2022-02-10--10-24/results-median-mobile-2022-02-10--10-24.csv';
+  // 
+  let mobileList = []
 
-  const list4 = await csv().fromFile(file4);
-  const list5 = await csv().fromFile(file5);
-  const list6 = await csv().fromFile(file6);
+  let mobileFilesPromise = allFiles.map(async file => {
+    if (file.includes('mobile')) {
+      let mobileFiles = fs.readdirSync(`${resultsFolder}/${file}`)
 
-  const mobileList = list4.concat(list5).concat(list6)
+      let mfiles = mobileFiles.map(async function (file2) {
 
-  //
-  // console.log(JSON.stringify(mobileList[0]))
-  // console.log(JSON.stringify(mobileList[1]))
+        if (file2.includes('-median-', `${resultsFolder}/${file}/${file2}`)) {
+          console.log('accessing file: ', `${resultsFolder}/${file}/${file2}`)
+          let file2List = await csv().fromFile(`${resultsFolder}/${file}/${file2}`)
+          mobileList = mobileList.concat(file2List)
+          return
+        }
+      })
+
+      await Promise.all(mfiles);
+    }
+  })
+
+  await Promise.all(mobileFilesPromise)
+  console.log('mobile', mobileList.length)
+  // 
 
   const mobileUrlMaps = {}
 
