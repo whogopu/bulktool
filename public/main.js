@@ -4,14 +4,61 @@ const drawChart = () => {
     .then(response => response.json())
     .then(data => {
 
+      function median(values) {
+        if (values.length === 0) throw new Error("No inputs");
+
+        values.sort(function (a, b) {
+          return a - b;
+        });
+
+        var half = Math.floor(values.length / 2);
+
+        if (values.length % 2)
+          return values[half];
+
+        return (values[half - 1] + values[half]) / 2.0;
+      }
+
+      const getMedianPerDay = (arr = []) => {
+        let data = []
+        let dateMap = {}
+        arr.forEach(a => {
+          let dateInString = moment(a[0]).format("YYYY-MM-DD");
+          var date = moment(dateInString).tz('Asia/Kolkata').format()
+          let timestamp = moment(date).format("x");
+          if (!dateMap.hasOwnProperty(timestamp)) dateMap[timestamp] = []
+          dateMap[timestamp].push(a)
+        })
+
+        // console.log(dateMap)
+
+        Object.keys(dateMap).forEach(d => {
+          let arr = dateMap[d];
+          let dateMedian = median(arr.map(a => a[0]));
+          let scoreMedian = median(arr.map(a => a[1]));
+          data.push([dateMedian, scoreMedian])
+        })
+
+        // console.log(data)
+
+        return data;
+
+      }
+
       const series = Object.keys(data.desktop).map(url => {
         return {
           name: url,
-          data: data.desktop[url]
+          // data: data.desktop[url]
+          data: getMedianPerDay(data.desktop[url])
         }
       })
 
+      // getMedianPerDay(data.desktop['https://www.99acres.com/rent-coworking-space-in-india-ffid?test=mytest'])
+      console.log(series)
       $('#container').highcharts({
+        time: {
+          timezoneOffset: -330
+        },
         chart: {
           type: 'spline',
           height: 800,
@@ -48,7 +95,8 @@ const drawChart = () => {
           type: 'datetime',
           dateTimeLabelFormats: { // don't display the dummy year
             month: '%e. %b',
-            year: '%b'
+            year: '%b',
+            // minTickInterval: 24 * 3600 * 1000,
           },
           title: {
             text: 'Date',
