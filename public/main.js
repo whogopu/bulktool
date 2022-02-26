@@ -73,6 +73,20 @@ getMedianPerDay = (arr = [], days = 0) => {
   return data;
 }
 
+let smallUrlsSet = [
+  "https://www.99acres.com/property-in-noida-ffid?test=mytest",
+  "https://www.99acres.com/property-in-sector-150-noida-ffid?test=mytest",
+  "https://www.99acres.com/property-for-rent-in-noida-ffid?test=mytest",
+  "https://www.99acres.com/property-for-rent-in-sector-150-noida-ffid?test=mytest",
+  "https://www.99acres.com/rent-paying-guest-pg-in-noida-ffid?test=mytest",
+  "https://www.99acres.com/rent-paying-guest-pg-in-sector-150-noida-ffid?test=mytest",
+  "https://www.99acres.com/commercial-property-in-noida-ffid?test=mytest",
+  "https://www.99acres.com/commercial-property-in-sector-150-noida-ffid?test=mytest",
+  "https://www.99acres.com/commercial-property-for-rent-in-noida-ffid?test=mytest",
+  "https://www.99acres.com/commercial-property-for-rent-in-sector-150-noida-ffid?test=mytest",
+  "https://www.99acres.com/rent-coworking-space-in-india-ffid?test=mytest"
+]
+
 const drawPlatformPerformanceChart = (id, label, series) => {
   $(id).highcharts({
     time: {
@@ -174,18 +188,29 @@ const drawChart = () => {
       });
 
       let days = params.days;
+      let urls = params.urls || 'default';
 
-      const desktopSeries = Object.keys(data.desktop).map(url => {
-        return {
-          name: url,
-          data: getMedianPerDay(data.desktop[url], days),
+      const desktopSeries = []
+      Object.keys(data.desktop).forEach(url => {
+        if (!(url.includes('module=test') || url.includes('module=dev'))) {
+          if (urls === 'default' || (urls === 'small' && smallUrlsSet.includes(url))) {
+            desktopSeries.push({
+              name: url,
+              data: getMedianPerDay(data.desktop[url], days),
+            })
+          }
         }
       })
 
-      const mobileSeries = Object.keys(data.mobile).map(url => {
-        return {
-          name: url,
-          data: getMedianPerDay(data.mobile[url], days),
+      const mobileSeries = []
+      Object.keys(data.mobile).forEach(url => {
+        if (!(url.includes('module=test') || url.includes('module=dev'))) {
+          if (urls === 'default' || (urls === 'small' && smallUrlsSet.includes(url))) {
+            mobileSeries.push({
+              name: url,
+              data: getMedianPerDay(data.mobile[url], days),
+            })
+          }
         }
       })
 
