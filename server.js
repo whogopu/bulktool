@@ -46,7 +46,7 @@ const mergeFiles = async (cb) => {
 
       let dfiles = desktopFiles.map(async function (file2) {
 
-        if (file2.includes('-median-', `${resultsFolder}/${file}/${file2}`)) {
+        if (file2.includes('-field-', `${resultsFolder}/${file}/${file2}`)) {
           console.log('accessing file: ', `${resultsFolder}/${file}/${file2}`)
           let file2List = await csv().fromFile(`${resultsFolder}/${file}/${file2}`)
           desktopList = desktopList.concat(file2List)
@@ -64,11 +64,12 @@ const mergeFiles = async (cb) => {
   const desktopUrlMaps = {}
 
   desktopList.forEach(item => {
-    if (!desktopUrlMaps.hasOwnProperty(item.testUrl)) {
-      desktopUrlMaps[item.testUrl] = []
+    if (!desktopUrlMaps.hasOwnProperty(item['test url'])) {
+      desktopUrlMaps[item['test url']] = []
     }
     let timestamp = moment(item.date, "YYYY-MM-DD hh:mm:ss").format("x")
-    desktopUrlMaps[item.testUrl].push([parseInt(timestamp), 100 * Math.round(item.PerformanceScore * 100) / 100])
+    // desktopUrlMaps[item.testUrl].push([parseInt(timestamp), 100 * Math.round(item.PerformanceScore * 100) / 100])
+    desktopUrlMaps[item['test url']].push([parseInt(timestamp), parseInt(item.lcp)])
   })
 
   writeFile(`./${desktopMergedFolder}/desktop.csv`, parse(desktopList)).catch((err) =>
@@ -84,7 +85,7 @@ const mergeFiles = async (cb) => {
 
       let mfiles = mobileFiles.map(async function (file2) {
 
-        if (file2.includes('-median-', `${resultsFolder}/${file}/${file2}`)) {
+        if (file2.includes('-field-', `${resultsFolder}/${file}/${file2}`)) {
           console.log('accessing file: ', `${resultsFolder}/${file}/${file2}`)
           let file2List = await csv().fromFile(`${resultsFolder}/${file}/${file2}`)
           mobileList = mobileList.concat(file2List)
@@ -103,11 +104,12 @@ const mergeFiles = async (cb) => {
   const mobileUrlMaps = {}
 
   mobileList.forEach(item => {
-    if (!mobileUrlMaps.hasOwnProperty(item.testUrl)) {
-      mobileUrlMaps[item.testUrl] = []
+    if (!mobileUrlMaps.hasOwnProperty(item['test url'])) {
+      mobileUrlMaps[item['test url']] = []
     }
     let timestamp = moment(item.date, "YYYY-MM-DD hh:mm:ss").format("x")
-    mobileUrlMaps[item.testUrl].push([parseInt(timestamp), 100 * Math.round(item.PerformanceScore * 100) / 100])
+    // mobileUrlMaps[item.testUrl].push([parseInt(timestamp), 100 * Math.round(item.PerformanceScore * 100) / 100])
+    mobileUrlMaps[item['test url']].push([parseInt(timestamp), parseInt(item.lcp)])
   })
   // console.log('final2', JSON.stringify(mobileUrlMaps))
 
