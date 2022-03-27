@@ -68,8 +68,8 @@ const mergeFiles = async (cb) => {
       desktopUrlMaps[item['testUrl']] = []
     }
     let timestamp = moment(item.date, "YYYY-MM-DD hh:mm:ss").format("x")
-    // desktopUrlMaps[item.testUrl].push([parseInt(timestamp), 100 * Math.round(item.PerformanceScore * 100) / 100])
-    desktopUrlMaps[item['testUrl']].push([parseInt(timestamp), parseInt(item.labLCP)])
+    desktopUrlMaps[item.testUrl].push([parseInt(timestamp), 100 * Math.round(item.PerformanceScore * 100) / 100])
+    // desktopUrlMaps[item['testUrl']].push([parseInt(timestamp), parseInt(item.labLCP)])
   })
 
   writeFile(`./${desktopMergedFolder}/desktop.csv`, parse(desktopList)).catch((err) =>
@@ -108,8 +108,8 @@ const mergeFiles = async (cb) => {
       mobileUrlMaps[item['testUrl']] = []
     }
     let timestamp = moment(item.date, "YYYY-MM-DD hh:mm:ss").format("x")
-    // mobileUrlMaps[item.testUrl].push([parseInt(timestamp), 100 * Math.round(item.PerformanceScore * 100) / 100])
-    mobileUrlMaps[item['testUrl']].push([parseInt(timestamp), parseInt(item.labLCP)])
+    mobileUrlMaps[item.testUrl].push([parseInt(timestamp), 100 * Math.round(item.PerformanceScore * 100) / 100])
+    // mobileUrlMaps[item['testUrl']].push([parseInt(timestamp), parseInt(item.labLCP)])
   })
   // console.log('final2', JSON.stringify(mobileUrlMaps))
 
