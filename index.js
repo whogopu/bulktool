@@ -69,6 +69,7 @@ const getSpeedData = async (testNum = 1) => {
       // Loop trough array to create batch of promises (array)
       const promises = chunk.map((testUrl,chunkItemIndex) => apiRequest(testUrl, device, i+1, chunkItemIndex+1, round+1, chunks.length, chunk.length, testNum ));
 
+      console.log('waiting for promise to fullfill...')
       // Send all requests in parallel
       const rawBatchResults = await Promise.allSettled(promises);
 

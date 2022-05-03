@@ -9,11 +9,11 @@ const key = 'AIzaSyDlqYhjKUA8He1lYFzI8EQ3wToAxRb8VWM'; // API Key (https://devel
 // Custom function to request PageSpeed API
 export const apiRequest = async (url, device, chunkIndex, chunkItemIndex, round, totalChunk, totalItem, totalRound) => {
   console.log(`calling at: ${new Date().toLocaleTimeString()} chunkIndex=${chunkIndex}/${totalChunk} | chunkItemIndex=${chunkItemIndex}/${totalItem} | round=${round}/${totalRound} | url=${url}`)
-  const { data } = await axios(`${endpoint}?url=${encodeURIComponent(url)}`, {
-    params: {
-      strategy: device,
-      key: key,
-    },
+  let finalUrl = `${endpoint}?url=${encodeURIComponent(url)}&strategy=${device}&key=${key}`
+  const { data } = await axios({
+    method: 'GET',
+    url: finalUrl,
+    timeout: 1000 * 100
   });
   return data;
 };

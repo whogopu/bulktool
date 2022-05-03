@@ -31,24 +31,19 @@ for d in */ ; do
       rm -rf "$d/json"
     else
       echo "Can Retain the folder - Now checking median file"
-      # echo "$base/$d"
-      cd "$base/$d"
-      count=$(ls | wc -l)
-      # for f in * ; do
-      #   echo -e "\n file $f"
-      # done
-      # echo $count
-      if [ $count -gt 1 ]
-      then
-        echo "This folder has median files - Retaining this directory"
-      elif [ $DATE_DIFF -gt 0 ]
-      then
-        echo "This folder is older than 1 day and not having median files - remove this directory"
-        cd "$base"
-        rm -rf "$d"
-      else
-        echo "It is todays' folder - ignoring it"
-      fi
+      # cd "$base/$d"
+      # count=$(ls | wc -l)
+      # if [ $count -gt 1 ]
+      # then
+      #   echo "This folder has median files - Retaining this directory"
+      # elif [ $DATE_DIFF -gt 0 ]
+      # then
+      #   echo "This folder is older than 1 day and not having median files - remove this directory"
+      #   cd "$base"
+      #   rm -rf "$d"
+      # else
+      #   echo "It is todays' folder - ignoring it"
+      # fi
     fi
 done
 echo -e "\nDone !! \n"
